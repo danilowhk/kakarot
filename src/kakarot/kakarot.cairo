@@ -56,6 +56,13 @@ func execute_at_address{
         let (stack: Uint256*) = alloc();
         let (zero_array: felt*) = alloc();
         // Deploy contract
+
+        %{
+            import logging
+            logging.info("*************CALLDATA LEN BEFORE DEPLOY*****************")
+            logging.info(ids.calldata_len)
+            logging.info("************************************")
+        %}
         let (evm_contract_address:felt, starknet_contract_address:felt) = deploy(bytes_len=calldata_len,bytes=calldata);
         return (
             stack_len=0,
@@ -158,29 +165,51 @@ func initiate{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr,bi
     // let (starknet_address) = IRegistry.get_starknet_address(
     //         contract_address=registry_address_, evm_address=address
     // );
+    // %{
+    //     import logging
+    //     logging.info("*************CALLING CODE FUNCTION*****************")
+    // %}
+
 
     // Get constructor and runtime code
     let (bytecode_len, bytecode) = IEvm_Contract.code(contract_address=starknet_address);
 
+    // %{
+    //     import logging
+    //     logging.info("*************BYTECODE LEN AFTER CODE FUNCTION*****************")
+    //     logging.info(ids.bytecode_len)
+    //     logging.info("************************************")
+    //     logging.info("*************STARTING EXECUTE AT ADDREES****************")
+    // %}
+
     //Run bytecode
     let context : model.ExecutionContext* = Kakarot.execute_at_address(address=evm_address,calldata=bytecode);
+
+    // %{
+    //     import logging
+    //     logging.info("*************AFTER EXECUTE AT ADDRESS*****************")
+    //     logging.info("*************RETURN DATA LEn*****************")
+    //     logging.info(ids.context.return_data_len)
+    //     logging.info("************************************")
+    // %}
 
     // Update evm_contract code
     IEvm_Contract.store_code(contract_address=context.starknet_address, code_len=context.return_data_len, code=context.return_data);
 
     //Call Kakarot.initiate function
 
-    %{
-        import logging
-        i = 0
-        res = ""
-        for i in range(ids.context.return_data_len):
-            res += " " + str(memory.get(ids.context.return_data + i))
-            i += i
-        logging.info("*************RETURN DATA DURING INITIATION*****************")
-        logging.info(res)
-        logging.info("************************************")
-    %}
+    // %{
+    //     import logging
+    //     i = 0
+    //     res = ""
+    //     for i in range(ids.context.return_data_len):
+    //         res += " " + str(memory.get(ids.context.return_data + i))
+    //         i += i
+    //     logging.info("*************RETURN DATA DURING INITIATION*****************")
+    //     logging.info(res)
+    //     logging.info("************************************")
+    // %}
 
     return (evm_contract_address=context.evm_address,starknet_contract_address=context.starknet_address);
 }
+

@@ -81,6 +81,13 @@ namespace ContractAccount {
         let code: felt* = alloc();
         // Read code length from storage.
         let (code_len) = code_len_.read();
+        %{
+            import logging
+            logging.info("*************CODE LEN DURING CODE FUNCTION*****************")
+            logging.info(ids.code_len)
+            logging.info("************************************")
+        %}
+        
         // Recursively load code into specified memory location.
         internal.load_code(0, code_len, code);
         return (code_len, code);
@@ -167,6 +174,12 @@ namespace internal {
         }
         let (value) = code_.read(index);
         assert [code + index] = value;
+        // %{
+        //     import logging
+        //     logging.info("*************INDEX AT LOAD_CODE*****************")
+        //     logging.info(ids.index)
+        //     logging.info("************************************")
+        // %}
         load_code(index + 1, code_len, code);
         return ();
     }

@@ -269,8 +269,10 @@ namespace MemoryOperations {
             logging.info(f"LOCATION:\t\t{ids.offset.low}")
         %}
 
+        let is_condition_valid: felt = is_le(1,skip_condition.low);
+
         // Update pc if skip_jump is anything other then 0
-        if (skip_condition.low == 1) {
+        if (is_condition_valid == 1) {
             // Update pc counter.
             let ctx = ExecutionContext.update_program_counter(ctx, offset.low);
             // Update context stack.
