@@ -183,7 +183,6 @@ namespace Kakarot {
     // @notice Deploy the starknetcontract holding the evm code
     // @param bytes: byte code stored in the new contract
     // @return evm_contract_address: address that is mapped to the actual new contract address
-    @external
     func deploy_contract{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         bytes_len: felt, bytes: felt*
     ) -> (evm_contract_address: felt, starknet_contract_address: felt) {

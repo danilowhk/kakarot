@@ -50,38 +50,65 @@ namespace Memory {
     }(self: model.Memory*, element: Uint256, offset: felt) -> model.Memory* {
         alloc_locals;
         let (new_memory: felt*) = alloc();
-        if (self.bytes_len == 0) {
+        let (computation_memory: felt*) = alloc();
+        //TODO self.bytes_len is not updating properly somewhere
+        let bytes_len: felt = Helpers.get_len(self.bytes);
+        if (bytes_len == 0) {
             Helpers.fill(arr=new_memory, value=0, length=offset);
         }
-        let is_offset_greater_than_length = is_le_felt(self.bytes_len, offset);
+        let is_offset_greater_than_length = is_le_felt(bytes_len, offset);
         local max_copy: felt;
         if (is_offset_greater_than_length == 1) {
-            Helpers.fill(arr=new_memory + self.bytes_len, value=0, length=offset - self.bytes_len);
-            max_copy = self.bytes_len;
+            Helpers.fill(arr=new_memory + bytes_len, value=0, length=offset - bytes_len);
+            max_copy = bytes_len;
         } else {
             max_copy = offset;
         }
         if (self.bytes_len != 0) {
             memcpy(dst=new_memory, src=self.bytes, len=max_copy);
         }
+        // %{
+        //     import logging
+        //     logging.info("BEFORE SPLIT_IN_1")
+        // %}
 
         split_int(
             value=element.high,
             n=16,
             base=2 ** 8,
             bound=2 ** 128,
-            output=self.bytes + self.bytes_len + 16,
+            output=self.bytes + bytes_len + 16,
         );
+
+
+        // %{
+        //     import logging
+        //     logging.info("BEFORE SPLIT_IN_2")
+        //     logging.info("ELEMENTS")
+        //     logging.info(ids.element.low)
+        //     logging.info("BYTES LEN")
+        //     logging.info(ids.self.bytes_len)
+        //     logging.info("CALCULATED LEN")
+        //     logging.info(ids.bytes_len)
+
+        // %}
         split_int(
-            value=element.low, n=16, base=2 ** 8, bound=2 ** 128, output=self.bytes + self.bytes_len
+            value=element.low, n=16, base=2 ** 8, bound=2 ** 128, output=self.bytes + bytes_len
         );
+        // %{
+        //     import logging
+        //     logging.info("AFTER SPLIT_IN_2")
+        // %}
         Helpers.reverse(
             old_arr_len=32,
-            old_arr=self.bytes + self.bytes_len,
+            old_arr=self.bytes + bytes_len,
             new_arr_len=32,
             new_arr=new_memory + offset,
         );
-
+        // %{
+        //     import logging
+        //     logging.info("AFTER REVERSE")
+        // %}
         let is_memory_growing = is_le_felt(self.bytes_len, offset + 32);
         local new_bytes_len: felt;
         if (is_memory_growing == 1) {
@@ -90,10 +117,15 @@ namespace Memory {
             memcpy(
                 dst=new_memory + offset + 32,
                 src=self.bytes + offset + 32,
-                len=self.bytes_len - (offset),
+                len=bytes_len - (offset),
             );
-            new_bytes_len = self.bytes_len;
+            new_bytes_len = bytes_len;
         }
+
+        // %{
+        //     import logging
+        //     logging.info("BEFORE RETURN")
+        // %}
 
         return new model.Memory(bytes=new_memory, bytes_len=new_bytes_len);
     }
@@ -249,3 +281,5 @@ namespace Memory {
         }
     }
 }
+
+

@@ -95,10 +95,10 @@ namespace MemoryOperations {
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
         alloc_locals;
-        %{
-            import logging
-            logging.info("0x52 - MSTORE")
-        %}
+        // %{
+        //     import logging
+        //     logging.info("0x52 - MSTORE")
+        // %}
 
         let stack = ctx.stack;
 
@@ -107,6 +107,14 @@ namespace MemoryOperations {
         // 1 - value: value to store in memory.
         let (stack, offset) = Stack.pop(stack);
         let (stack, value) = Stack.pop(stack);
+
+        %{
+            import logging
+            logging.info("0x52 - MSTORE")
+            logging.info(f"OFFSET:\t\t{ids.offset.low}")
+            logging.info(f"VALUE:\t\t{ids.value.low}")
+
+        %}
 
         let memory: model.Memory* = Memory.store(self=ctx.memory, element=value, offset=offset.low);
 
@@ -117,6 +125,10 @@ namespace MemoryOperations {
         let ctx = ExecutionContext.update_stack(ctx, stack);
         // Increment gas used.
         let ctx = ExecutionContext.increment_gas_used(ctx, GAS_COST_MSTORE);
+        // %{
+        //     import logging
+        //     logging.info("MSTORE END")
+        // %}
         return ctx;
     }
 
@@ -191,19 +203,30 @@ namespace MemoryOperations {
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
         alloc_locals;
-        %{
-            import logging
-            logging.info("0x56 - JUMP")
-        %}
+        // %{
+        //     import logging
+        //     logging.info("0x56 - JUMP")
+        // %}
 
         let stack = ctx.stack;
 
         // Stack input:
         // 0 - offset: offset in the deployed code where execution will continue from
         let (stack, offset) = Stack.pop(stack);
+        %{
+            import logging
+            logging.info("0x56 - JUMP")
+            logging.info(f"CURRENT COUNTER:{ids.ctx.program_counter}")
+            logging.info(f"LOCATION:{ids.offset.low}")
+        %}
 
         // Update pc counter.
-        ExecutionContext.update_program_counter(ctx, offset.low);
+        let ctx = ExecutionContext.update_program_counter(ctx, offset.low);
+
+        %{
+            import logging
+            logging.info(f"UPDATED COUNTER:{ids.ctx.program_counter}")
+        %}
 
         // Update context stack.
         let ctx = ExecutionContext.update_stack(ctx, stack);
@@ -227,10 +250,10 @@ namespace MemoryOperations {
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
         alloc_locals;
-        %{
-            import logging
-            logging.info("0x57 - JUMPI")
-        %}
+        // %{
+        //     import logging
+        //     logging.info("0x57 - JUMPI")
+        // %}
 
         let stack = ctx.stack;
 
@@ -239,6 +262,12 @@ namespace MemoryOperations {
         // 1 - skip_jump: condition that will trigger a jump if not FALSE
         let (stack, offset) = Stack.pop(stack);
         let (stack, skip_condition) = Stack.pop(stack);
+
+        %{
+            import logging
+            logging.info("0x57 - JUMPI")
+            logging.info(f"LOCATION:\t\t{ids.offset.low}")
+        %}
 
         // Update pc if skip_jump is anything other then 0
         if (skip_condition.low == 1) {
@@ -273,6 +302,7 @@ namespace MemoryOperations {
         %{
             import logging
             logging.info("0x5b - JUMPDEST")
+            logging.info(f"JUMPDEST LOCATION:\t\t{ids.ctx.program_counter}")
         %}
         alloc_locals;
         // Increment gas used.
@@ -374,10 +404,10 @@ namespace MemoryOperations {
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
         alloc_locals;
-        %{
-            import logging
-            logging.info("0x55 - SSTORE")
-        %}
+        // %{
+        //     import logging
+        //     logging.info("0x55 - SSTORE")
+        // %}
 
         let stack = ctx.stack;
 
@@ -391,6 +421,13 @@ namespace MemoryOperations {
         // 1 - value: value for given key.
         let (stack, local key) = Stack.pop(stack);
         let (stack, local value) = Stack.pop(stack);
+
+        %{
+            import logging
+            logging.info("0x55 - SSTORE")
+            logging.info(f"KEY:\t\t{ids.key.low}")
+            logging.info(f"VALUE:\t\t{ids.value.low}")
+        %}
 
         // 3. Call Write storage on contract with starknet address
 
@@ -437,6 +474,13 @@ namespace MemoryOperations {
         let (local value: Uint256) = IEvm_Contract.state(
             contract_address=starknet_address, key=key
         );
+
+        %{
+            import logging
+            logging.info("0x54 - SLOAD")
+            logging.info(f"KEY:\t\t{ids.key.low}")
+            logging.info(f"VALUE:\t\t{ids.value.low}")
+        %}
 
         let stack: model.Stack* = Stack.push(stack, value);
 

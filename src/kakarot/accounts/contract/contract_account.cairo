@@ -57,3 +57,16 @@ func state{
 }(key: Uint256) -> (value: Uint256) {
     return ContractAccount.read_state(key);
 }
+
+@external
+func initiate{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr, bitwise_ptr: BitwiseBuiltin*
+}(){
+    return ContractAccount.initiate();
+}
+
+
+@view
+func have_initiaded{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr, bitwise_ptr: BitwiseBuiltin*
+}() -> (is_initiated: felt){
+    return ContractAccount.is_initiated();
+}

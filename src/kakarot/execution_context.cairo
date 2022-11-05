@@ -391,6 +391,13 @@ namespace ExecutionContext {
             logging.info("===================================")
         %}
         Memory.dump(self.memory);
+        %{
+            import logging
+            logging.info("***********************************")
+            logging.info("===================================")
+            logging.info("*************RETURN DATA LEN*****************")
+            logging.info(ids.self.return_data_len)
+        %}
 
         return ();
     }

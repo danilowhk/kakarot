@@ -28,6 +28,10 @@ func code_len_() -> (res: felt) {
 @storage_var
 func state_(key: Uint256) -> (value: Uint256) {
 }
+@storage_var
+func is_initiated_() -> (res: felt) {
+}
+
 
 namespace ContractAccount {
     // @notice This function is used to initialize the smart contract account.
@@ -98,7 +102,33 @@ namespace ContractAccount {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(key: Uint256, value: Uint256) {
+        // Access control check.
+        Ownable.assert_only_owner();
+        // Write State
         state_.write(key, value);
+        return ();
+    }
+
+    func is_initiated{
+        syscall_ptr: felt*,
+        pedersen_ptr: HashBuiltin*,
+        range_check_ptr,
+        bitwise_ptr: BitwiseBuiltin*,
+    }() -> (is_initiated:felt){
+        let is_initiated : felt = is_initiated_.read();
+        return (is_initiated=is_initiated);
+    }
+
+    func initiate{
+        syscall_ptr: felt*,
+        pedersen_ptr: HashBuiltin*,
+        range_check_ptr,
+        bitwise_ptr: BitwiseBuiltin*,
+    }(){
+        // Access control check.
+        Ownable.assert_only_owner();
+        // Initiate Evm contract
+        is_initiated_.write(1);
         return ();
     }
 }
@@ -140,4 +170,6 @@ namespace internal {
         load_code(index + 1, code_len, code);
         return ();
     }
+
+
 }

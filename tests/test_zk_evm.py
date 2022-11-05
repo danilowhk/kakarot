@@ -44,8 +44,48 @@ async def set_account_registry(zk_evm, account_registry):
 test_cases = [
     {
         "params": {
+            "code": "608060405234801561001057600080fd5b5060405160208061021783398101604090815290516000818155338152600160205291909120556101d1806100466000396000f3006080604052600436106100565763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166318160ddd811461005b57806370a0823114610082578063a9059cbb146100b0575b600080fd5b34801561006757600080fd5b506100706100f5565b60408051918252519081900360200190f35b34801561008e57600080fd5b5061007073ffffffffffffffffffffffffffffffffffffffff600435166100fb565b3480156100bc57600080fd5b506100e173ffffffffffffffffffffffffffffffffffffffff60043516602435610123565b604080519115158252519081900360200190f35b60005490565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604090205490565b600073ffffffffffffffffffffffffffffffffffffffff8316151561014757600080fd5b3360009081526001602052604090205482111561016357600080fd5b503360009081526001602081905260408083208054859003905573ffffffffffffffffffffffffffffffffffffffff85168352909120805483019055929150505600a165627a7a72305820a5d999f4459642872a29be93a490575d345e40fc91a7cccb2cf29c88bcdaf3be00290000000000000000000000000000000000000000000000000000000000002710",
+            "calldata": "18160ddd",
+            "stack": "",
+            "memory": "0000000000000000000000000000000000000000000000000000000000000042",
+            "return_value": "0000000000000000000000000000000000000000000000000000000000000042",
+        },
+        "id": "constructor_test_erc20",
+    },
+    {
+        "params": {
+            "code": "608060405234801561001057600080fd5b5060405160208061021783398101604090815290516000818155338152600160205291909120556101d1806100466000396000f3006080604052600436106100565763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166318160ddd811461005b57806370a0823114610082578063a9059cbb146100b0575b600080fd5b34801561006757600080fd5b506100706100f5565b60408051918252519081900360200190f35b34801561008e57600080fd5b5061007073ffffffffffffffffffffffffffffffffffffffff600435166100fb565b3480156100bc57600080fd5b506100e173ffffffffffffffffffffffffffffffffffffffff60043516602435610123565b604080519115158252519081900360200190f35b60005490565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604090205490565b600073ffffffffffffffffffffffffffffffffffffffff8316151561014757600080fd5b3360009081526001602052604090205482111561016357600080fd5b503360009081526001602081905260408083208054859003905573ffffffffffffffffffffffffffffffffffffffff85168352909120805483019055929150505600a165627a7a72305820a5d999f4459642872a29be93a490575d345e40fc91a7cccb2cf29c88bcdaf3be00290000000000000000000000000000000000000000000000000000000000002710",
+            "calldata": "70a082310000000000000000000000000000000000000000000000000000000000000001",
+            "stack": "",
+            "memory": "0000000000000000000000000000000000000000000000000000000000000042",
+            "return_value": "0000000000000000000000000000000000000000000000000000000000000042",
+        },
+        "id": "constructor_test_erc20_0",
+    },
+    {
+        "params": {
+            "code": "608060405234801561001057600080fd5b5060405160208061021783398101604090815290516000818155338152600160205291909120556101d1806100466000396000f3006080604052600436106100565763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166318160ddd811461005b57806370a0823114610082578063a9059cbb146100b0575b600080fd5b34801561006757600080fd5b506100706100f5565b60408051918252519081900360200190f35b34801561008e57600080fd5b5061007073ffffffffffffffffffffffffffffffffffffffff600435166100fb565b3480156100bc57600080fd5b506100e173ffffffffffffffffffffffffffffffffffffffff60043516602435610123565b604080519115158252519081900360200190f35b60005490565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604090205490565b600073ffffffffffffffffffffffffffffffffffffffff8316151561014757600080fd5b3360009081526001602052604090205482111561016357600080fd5b503360009081526001602081905260408083208054859003905573ffffffffffffffffffffffffffffffffffffffff85168352909120805483019055929150505600a165627a7a72305820a5d999f4459642872a29be93a490575d345e40fc91a7cccb2cf29c88bcdaf3be00290000000000000000000000000000000000000000000000000000000000002710",
+            "calldata": "0xa9059cbb0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc400000000000000000000000000000000000000000000000000000000000003e8",
+            "stack": "",
+            "memory": "0000000000000000000000000000000000000000000000000000000000000042",
+            "return_value": "0000000000000000000000000000000000000000000000000000000000000042",
+        },
+        "id": "constructor_test_erc20_2",
+    },
+    {
+        "params": {
             "code": "604260005260206000F3",
-            "calldata": "",
+            "calldata": "0xa9059cbb0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc400000000000000000000000000000000000000000000000000000000000003e8",
+            "stack": "",
+            "memory": "0000000000000000000000000000000000000000000000000000000000000042",
+            "return_value": "0000000000000000000000000000000000000000000000000000000000000042",
+        },
+        "id": "constructor_test",
+    },
+    {
+        "params": {
+            "code": "0000",
+            "calldata": "608060405234801561001057600080fd5b5060405160208061021783398101604090815290516000818155338152600160205291909120556101d1806100466000396000f3006080604052600436106100565763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166318160ddd811461005b57806370a0823114610082578063a9059cbb146100b0575b600080fd5b34801561006757600080fd5b506100706100f5565b60408051918252519081900360200190f35b34801561008e57600080fd5b5061007073ffffffffffffffffffffffffffffffffffffffff600435166100fb565b3480156100bc57600080fd5b506100e173ffffffffffffffffffffffffffffffffffffffff60043516602435610123565b604080519115158252519081900360200190f35b60005490565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604090205490565b600073ffffffffffffffffffffffffffffffffffffffff8316151561014757600080fd5b3360009081526001602052604090205482111561016357600080fd5b503360009081526001602081905260408083208054859003905573ffffffffffffffffffffffffffffffffffffffff85168352909120805483019055929150505600a165627a7a72305820a5d999f4459642872a29be93a490575d345e40fc91a7cccb2cf29c88bcdaf3be00290000000000000000000000000000000000000000000000000000000000002710",
             "stack": "",
             "memory": "0000000000000000000000000000000000000000000000000000000000000042",
             "return_value": "0000000000000000000000000000000000000000000000000000000000000042",
@@ -60,7 +100,7 @@ test_cases = [
             "memory": "0000000000000000000000000000000000000000000000000000000000000000",
             "return_value": "0000000000000000000000000000000000000000000000000000000000000000",
         },
-        "id": "return2",
+        "id": "return3",
     },
     {
         "params": {
@@ -1283,22 +1323,71 @@ class TestZkEVM:
         # TODO: not sure how of those we want to re-run with the execute_at_address because it is very slow
         # TODO: This is a magic number.
     )
-    async def test_execute_at_address(self, zk_evm, params):
+    async def test_execute_at_address(self,starknet: Starknet, zk_evm, params,contract_account_class: DeclaredClass):
         Uint256 = zk_evm.struct_manager.get_contract_struct("Uint256")
-        tx = await zk_evm.deploy(
-            bytes=[int(b, 16) for b in wrap(params["code"], 2)],
+        # tx = await zk_evm.deploy(
+        #     bytes=[int(b, 16) for b in wrap(params["code"], 2)],
+        # ).execute(caller_address=1)
+        # evm_contract_address = tx.result.evm_contract_address
+        
+        deployer_address = 0000000000000000000000000000000000000000
+        res1 = await zk_evm.execute_at_address(
+            address=deployer_address,
+            calldata=[int(b, 16) for b in wrap(params["code"], 2)],
         ).execute(caller_address=1)
-        evm_contract_address = tx.result.evm_contract_address
 
-        res = await zk_evm.execute_at_address(
-            address=evm_contract_address,
+        #PRINTS
+        evm_contract_address = res1.result.evm_contract_address
+        starknet_contract_address = res1.result.starknet_contract_address
+        stack = res1.result.stack
+        memory = res1.result.memory
+
+        print("CONTRACT DEPLOYED")
+        print("EVM ADDRESS")
+        print(evm_contract_address)
+        print("STARKNET ADDRESS")
+        print(starknet_contract_address)
+        print("STACK")
+        print(stack)
+        print("MEMORY")
+        print(memory)
+
+        res2 = await zk_evm.initiate(
+            evm_address=evm_contract_address,
+            starknet_address=starknet_contract_address
+        ).execute(caller_address=1)
+
+        print("CONTRACT INITIATED")
+        print(res2.result.evm_contract_address)
+        print("RETURN DATA")
+
+        res3 = await zk_evm.execute_at_address(
+            address=res2.result.evm_contract_address,
             calldata=[int(b, 16) for b in wrap(params["calldata"], 2)],
         ).execute(caller_address=1)
-        assert res.result.stack == [
-            Uint256(*self.int_to_uint256(int(s)))
-            for s in (params["stack"].split(",") if params["stack"] else [])
-        ]
-        assert res.result.memory == [int(m, 16) for m in wrap(params["memory"], 2)]
+
+        # account_contract = StarknetContract(
+        #     starknet.state,
+        #     contract_account_class.abi,
+        #     starknet_contract_address,
+        #     tx,
+        # )
+        # code = (await account_contract.code().call()).result.code
+        # print("Contract Code")
+        # print(code)
+
+
+        # Have new calldata for contract call
+
+        # res = await zk_evm.execute_at_address(
+        #     address=evm_contract_address,
+        #     calldata=[int(b, 16) for b in wrap(params["calldata"], 2)],
+        # ).execute(caller_address=1)
+        # assert res.result.stack == [
+        #     Uint256(*self.int_to_uint256(int(s)))
+        #     for s in (params["stack"].split(",") if params["stack"] else [])
+        # ]
+        # assert res.result.memory == [int(m, 16) for m in wrap(params["memory"], 2)]
 
     async def test_deploy(
         self,
@@ -1316,3 +1405,6 @@ class TestZkEVM:
             tx,
         )
         assert (await account_contract.code().call()).result.code == code
+
+
+
