@@ -146,6 +146,32 @@ namespace SystemOperations {
             ctx, new_return_data_len=size.low, new_return_data=new_return_data
         );
     }
+
+    // @notice REVERT operation.
+    // @dev Designated invalid instruction.
+    // @custom:since Frontier
+    // @custom:group System Operations
+    // @custom:gas NaN
+    // @custom:stack_consumed_elements 0
+    // @custom:stack_produced_elements 0
+    // @return The pointer to the updated execution context.
+    func exec_revert{
+        syscall_ptr: felt*,
+        pedersen_ptr: HashBuiltin*,
+        range_check_ptr,
+        bitwise_ptr: BitwiseBuiltin*,
+    }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
+        %{
+            import logging
+            logging.info("0xFD - REVERT")
+        %}
+        with_attr error_message("Kakarot: 0xFD: REVERT - Transaction Failed") {
+            assert TRUE = FALSE;
+        }
+        // TODO: consume gas up until this point
+
+        return ctx;
+    }
 }
 
 

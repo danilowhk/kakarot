@@ -111,8 +111,8 @@ namespace MemoryOperations {
         %{
             import logging
             logging.info("0x52 - MSTORE")
-            logging.info(f"OFFSET:\t\t{ids.offset.low}")
-            logging.info(f"VALUE:\t\t{ids.value.low}")
+            #logging.info(f"OFFSET:\t\t{ids.offset.low}")
+            #logging.info(f"VALUE:\t\t{ids.value.low}")
 
         %}
 
@@ -216,8 +216,8 @@ namespace MemoryOperations {
         %{
             import logging
             logging.info("0x56 - JUMP")
-            logging.info(f"CURRENT COUNTER:{ids.ctx.program_counter}")
-            logging.info(f"LOCATION:{ids.offset.low}")
+            #logging.info(f"CURRENT COUNTER:{ids.ctx.program_counter}")
+            #logging.info(f"LOCATION:{ids.offset.low}")
         %}
 
         // Update pc counter.
@@ -225,7 +225,7 @@ namespace MemoryOperations {
 
         %{
             import logging
-            logging.info(f"UPDATED COUNTER:{ids.ctx.program_counter}")
+            #logging.info(f"UPDATED COUNTER:{ids.ctx.program_counter}")
         %}
 
         // Update context stack.
@@ -266,7 +266,7 @@ namespace MemoryOperations {
         %{
             import logging
             logging.info("0x57 - JUMPI")
-            logging.info(f"LOCATION:\t\t{ids.offset.low}")
+            #logging.info(f"LOCATION:\t\t{ids.offset.low}")
         %}
 
         let is_condition_valid: felt = is_le(1,skip_condition.low);
@@ -304,7 +304,7 @@ namespace MemoryOperations {
         %{
             import logging
             logging.info("0x5b - JUMPDEST")
-            logging.info(f"JUMPDEST LOCATION:\t\t{ids.ctx.program_counter}")
+            #logging.info(f"JUMPDEST LOCATION:\t\t{ids.ctx.program_counter}")
         %}
         alloc_locals;
         // Increment gas used.
@@ -427,8 +427,8 @@ namespace MemoryOperations {
         %{
             import logging
             logging.info("0x55 - SSTORE")
-            logging.info(f"KEY:\t\t{ids.key.low}")
-            logging.info(f"VALUE:\t\t{ids.value.low}")
+            #logging.info(f"KEY:\t\t{ids.key.low}")
+            #logging.info(f"VALUE:\t\t{ids.value.low}")
         %}
 
         // 3. Call Write storage on contract with starknet address
@@ -480,8 +480,8 @@ namespace MemoryOperations {
         %{
             import logging
             logging.info("0x54 - SLOAD")
-            logging.info(f"KEY:\t\t{ids.key.low}")
-            logging.info(f"VALUE:\t\t{ids.value.low}")
+            #logging.info(f"KEY:\t\t{ids.key.low}")
+            #logging.info(f"VALUE:\t\t{ids.value.low}")
         %}
 
         let stack: model.Stack* = Stack.push(stack, value);

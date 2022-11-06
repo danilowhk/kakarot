@@ -223,7 +223,10 @@ namespace EnvironmentalInformation {
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
         alloc_locals;
-        %{ print("0x35 - CALLDATALOAD") %}
+        %{
+            import logging
+            logging.info("0x35 - CALLDATALOAD")
+        %}
 
         let stack = ctx.stack;
 

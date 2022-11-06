@@ -81,12 +81,12 @@ namespace ContractAccount {
         let code: felt* = alloc();
         // Read code length from storage.
         let (code_len) = code_len_.read();
-        %{
-            import logging
-            logging.info("*************CODE LEN DURING CODE FUNCTION*****************")
-            logging.info(ids.code_len)
-            logging.info("************************************")
-        %}
+        // %{
+        //     import logging
+        //     logging.info("*************CODE LEN DURING CODE FUNCTION*****************")
+        //     logging.info(ids.code_len)
+        //     logging.info("************************************")
+        // %}
         
         // Recursively load code into specified memory location.
         internal.load_code(0, code_len, code);

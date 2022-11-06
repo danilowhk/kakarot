@@ -57,12 +57,12 @@ func execute_at_address{
         let (zero_array: felt*) = alloc();
         // Deploy contract
 
-        %{
-            import logging
-            logging.info("*************CALLDATA LEN BEFORE DEPLOY*****************")
-            logging.info(ids.calldata_len)
-            logging.info("************************************")
-        %}
+        // %{
+        //     import logging
+        //     logging.info("*************CALLDATA LEN BEFORE DEPLOY*****************")
+        //     logging.info(ids.calldata_len)
+        //     logging.info("************************************")
+        // %}
         let (evm_contract_address:felt, starknet_contract_address:felt) = deploy(bytes_len=calldata_len,bytes=calldata);
         return (
             stack_len=0,

@@ -150,14 +150,14 @@ namespace ArithmeticOperations {
         // Compute the subtraction
         // let (result) = SafeUint256.sub_le(a, b);
         let (result) = uint256_sub(a,b);
-        %{
-            import logging
-            logging.info("0x03 - SUB")
-            logging.info(ids.a.low)
-            logging.info(ids.b.low)
-            logging.info(ids.result.low)
-            logging.info(ids.result.high)
-        %}
+        // %{
+        //     import logging
+        //     logging.info("0x03 - SUB")
+        //     logging.info(ids.a.low)
+        //     logging.info(ids.b.low)
+        //     logging.info(ids.result.low)
+        //     logging.info(ids.result.high)
+        // %}
         // Stack output:
         // a - b: integer result of the subtraction modulo 2^256
         let stack: model.Stack* = Stack.push(self=stack, element=result);

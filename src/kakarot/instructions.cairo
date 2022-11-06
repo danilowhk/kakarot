@@ -614,6 +614,9 @@ namespace EVMInstructions {
         );
         // 0xF3 - RETURN
         add_instruction(instructions, 0xf3, SystemOperations.exec_return);
+        // 0xFD - REVERT
+        add_instruction(instructions, 0xfd, SystemOperations.exec_revert);
         return instructions;
+
     }
 }
