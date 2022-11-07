@@ -4,10 +4,9 @@
 
 // Starkware dependencies
 from starkware.cairo.common.alloc import alloc
-from starkware.cairo.common.cairo_builtins import HashBuiltin, BitwiseBuiltin
-from starkware.cairo.common.uint256 import Uint256, uint256_unsigned_div_rem
+from starkware.cairo.common.uint256 import Uint256
 from starkware.cairo.common.math_cmp import is_le_felt, is_le
-from starkware.cairo.common.math import assert_lt, split_int, unsigned_div_rem
+from starkware.cairo.common.math import split_int, unsigned_div_rem
 from starkware.cairo.common.memcpy import memcpy
 from starkware.cairo.common.bool import TRUE
 
@@ -18,7 +17,7 @@ from utils.utils import Helpers
 // @title Memory related functions.
 // @notice This file contains functions related to the memory.
 // @dev The memory is a region that only exists during the smart contract execution, and is accessed with a byte offset.
-// @dev  While all the 32-byte address space is available and initialized to 0, the size is counted with the highest address that was accessed.
+// @dev While all the 32-byte address space is available and initialized to 0, the size is counted with the highest address that was accessed.
 // @dev It is generally read and written with `MLOAD` and `MSTORE` instructions, but is also used by other instructions like `CREATE` or `EXTCODECOPY`.
 // @author @abdelhamidbakhta
 // @custom:namespace Memory
@@ -26,37 +25,33 @@ from utils.utils import Helpers
 namespace Memory {
     // @notice Initialize the memory.
     // @return The pointer to the memory.
-    func init{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }() -> model.Memory* {
+    func init() -> model.Memory* {
         alloc_locals;
         let (bytes: felt*) = alloc();
         return new model.Memory(bytes=bytes, bytes_len=0);
     }
 
     // @notice Store an element into the memory.
-    // @param self - The pointer to the memory.
-    // @param element - The element to push.
-    // @param offset - The offset to store the element at.
+    // @param self The pointer to the memory.
+    // @param element The element to push.
+    // @param offset The offset to store the element at.
     // @return The new pointer to the memory.
-    func store{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(self: model.Memory*, element: Uint256, offset: felt) -> model.Memory* {
+    func store{range_check_ptr}(
+        self: model.Memory*, element: Uint256, offset: felt
+    ) -> model.Memory* {
         alloc_locals;
         let (new_memory: felt*) = alloc();
+
         let (computation_memory: felt*) = alloc();
         //TODO self.bytes_len is not updating properly somewhere
-        let bytes_len: felt = Helpers.get_len(self.bytes);
-        if (bytes_len == 0) {
+
+        // If current memory is empty initialize current memory to be zeros unitl offset is reached
+        if (self.bytes_len == 0) {
             Helpers.fill(arr=new_memory, value=0, length=offset);
         }
-        let is_offset_greater_than_length = is_le_felt(bytes_len, offset);
+        // If offest is larger then memory length, fill memory with zeros until memory length reaches the offset
+        let is_offset_greater_than_length = is_le_felt(self.bytes_len, offset);
+
         local max_copy: felt;
         if (is_offset_greater_than_length == 1) {
             Helpers.fill(arr=new_memory + bytes_len, value=0, length=offset - bytes_len);
@@ -80,35 +75,17 @@ namespace Memory {
             output=self.bytes + bytes_len + 16,
         );
 
-
-        // %{
-        //     import logging
-        //     logging.info("BEFORE SPLIT_IN_2")
-        //     logging.info("ELEMENTS")
-        //     logging.info(ids.element.low)
-        //     logging.info("BYTES LEN")
-        //     logging.info(ids.self.bytes_len)
-        //     logging.info("CALCULATED LEN")
-        //     logging.info(ids.bytes_len)
-
-        // %}
         split_int(
             value=element.low, n=16, base=2 ** 8, bound=2 ** 128, output=self.bytes + bytes_len
         );
-        // %{
-        //     import logging
-        //     logging.info("AFTER SPLIT_IN_2")
-        // %}
+
         Helpers.reverse(
             old_arr_len=32,
             old_arr=self.bytes + bytes_len,
             new_arr_len=32,
             new_arr=new_memory + offset,
         );
-        // %{
-        //     import logging
-        //     logging.info("AFTER REVERSE")
-        // %}
+ 
         let is_memory_growing = is_le_felt(self.bytes_len, offset + 32);
         local new_bytes_len: felt;
         if (is_memory_growing == 1) {
@@ -122,26 +99,19 @@ namespace Memory {
             new_bytes_len = bytes_len;
         }
 
-        // %{
-        //     import logging
-        //     logging.info("BEFORE RETURN")
-        // %}
 
         return new model.Memory(bytes=new_memory, bytes_len=new_bytes_len);
     }
 
-    // @notice store_n - Store N bytes into the memory.
-    // @param self - The pointer to the memory.
-    // @param element_len - byte length of the array to be saved on memory.
-    // @param element - pointer to the array that will be saved on memory.
-    // @param offset - The offset to store the element at.
+    // @notice store_n Store N bytes into the memory.
+    // @param self The pointer to the memory.
+    // @param element_len byte length of the array to be saved on memory.
+    // @param element pointer to the array that will be saved on memory.
+    // @param offset The offset to store the element at.
     // @return The new pointer to the memory.
-    func store_n{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(self: model.Memory*, element_len: felt, element: felt*, offset: felt) -> model.Memory* {
+    func store_n{range_check_ptr}(
+        self: model.Memory*, element_len: felt, element: felt*, offset: felt
+    ) -> model.Memory* {
         alloc_locals;
         // New memory is composed of 3 parts: head, element and tail
         // Head are the bytes before offset.
@@ -183,12 +153,7 @@ namespace Memory {
     // @param offset - The offset to load the element from.
     // @return The new pointer to the memory.
     // @return The loaded element.
-    func load{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(self: model.Memory*, offset: felt) -> Uint256 {
+    func load{range_check_ptr}(self: model.Memory*, offset: felt) -> Uint256 {
         alloc_locals;
 
         // Check if the offset + 32 > MSIZE
@@ -210,12 +175,7 @@ namespace Memory {
 
     // @notice Print the memory.
     // @param self - The pointer to the memory.
-    func dump{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(self: model.Memory*) {
+    func dump(self: model.Memory*) {
         %{
             import logging
             i = 0
@@ -235,12 +195,9 @@ namespace Memory {
     // @param length - The number of bytes to add.
     // @return The new pointer to the memory.
     // @return The gas cost of this expansion.
-    func expand{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(self: model.Memory*, length: felt) -> (new_memory: model.Memory*, cost: felt) {
+    func expand{range_check_ptr}(self: model.Memory*, length: felt) -> (
+        new_memory: model.Memory*, cost: felt
+    ) {
         Helpers.fill(self.bytes + self.bytes_len, value=0, length=length);
         let (last_memory_size_word, _) = unsigned_div_rem(value=self.bytes_len + 31, div=32);
         let (last_memory_cost, _) = unsigned_div_rem(
@@ -266,12 +223,9 @@ namespace Memory {
     // @param offset - The number of bytes to add.
     // @return The new pointer to the memory.
     // @return The gas cost of this expansion.
-    func insure_length{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(self: model.Memory*, length: felt) -> (new_memory: model.Memory*, cost: felt) {
+    func insure_length{range_check_ptr}(self: model.Memory*, length: felt) -> (
+        new_memory: model.Memory*, cost: felt
+    ) {
         let is_memory_expanding = is_le_felt(self.bytes_len + 1, length);
         if (is_memory_expanding == TRUE) {
             let (new_memory, cost) = Memory.expand(self=self, length=length - self.bytes_len);

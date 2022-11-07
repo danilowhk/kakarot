@@ -3,12 +3,10 @@
 %lang starknet
 
 // Starkware dependencies
-from starkware.cairo.common.math import assert_le_felt
 from starkware.cairo.common.math_cmp import is_le_felt
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin, BitwiseBuiltin
 from starkware.cairo.common.cairo_keccak.keccak import keccak_bigend, finalize_keccak
-from starkware.cairo.common.math import unsigned_div_rem
 from starkware.cairo.common.uint256 import Uint256
 from starkware.cairo.common.pow import pow
 from starkware.cairo.common.bool import TRUE
@@ -17,7 +15,6 @@ from kakarot.memory import Memory
 from kakarot.model import model
 from kakarot.execution_context import ExecutionContext
 from kakarot.stack import Stack
-from utils.utils import Helpers
 
 // @title Sha3 opcodes.
 // @notice This file contains the keccak opcode.
@@ -33,6 +30,7 @@ namespace Sha3 {
     // @custom:gas 30
     // @custom:stack_consumed_elements 2
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context
     // @return The pointer to the updated execution context.
     func exec_sha3{
         syscall_ptr: felt*,
@@ -51,8 +49,9 @@ namespace Sha3 {
         // Stack input:
         // 0 - offset: memory offset for the begining of the hash.
         // 1 - length: how many values we hash.
-        let (stack, offset: Uint256) = Stack.pop(stack);
-        let (stack, length: Uint256) = Stack.pop(stack);
+        let (stack, popped) = Stack.pop_n(self=stack, n=2);
+        let offset = popped[1];
+        let length = popped[0];
 
         let (memory, cost) = Memory.insure_length(self=ctx.memory, length=offset.low + length.low);
 
@@ -88,8 +87,9 @@ namespace Sha3 {
         let minimum_word_size = (length.low + 31) / 32;
         let dynamic_gas = 6 * minimum_word_size + cost;
 
-        let ctx = ExecutionContext.increment_gas_used(self=ctx, inc_value=GAS_COST_SHA3 + dynamic_gas);
-        let memory_extension = length.low - ctx.memory.bytes_len + offset.low;
+        let ctx = ExecutionContext.increment_gas_used(
+            self=ctx, inc_value=GAS_COST_SHA3 + dynamic_gas
+        );
 
         return ctx;
     }
@@ -134,7 +134,7 @@ namespace Sha3 {
             tempvar _byte8_shift = byte8_shift + 1;
             tempvar _dest_index = dest_index;
         }
-        
+
         return bytes_to_byte8_little_endian(
             bytes_len, bytes, index + 1, size, _byte8, _byte8_shift, dest, _dest_index
         );

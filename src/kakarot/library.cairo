@@ -9,7 +9,6 @@ from starkware.cairo.common.bool import TRUE, FALSE
 from starkware.cairo.common.math import split_felt
 from starkware.cairo.common.memcpy import memcpy
 from starkware.starknet.common.syscalls import deploy
-from starkware.cairo.common.uint256 import Uint256
 from starkware.starknet.common.syscalls import get_contract_address
 // OpenZeppelin dependencies
 from openzeppelin.access.ownable.library import Ownable
@@ -17,7 +16,7 @@ from openzeppelin.access.ownable.library import Ownable
 // Internal dependencies
 from kakarot.model import model
 from kakarot.instructions import EVMInstructions
-from kakarot.interfaces.interfaces import IRegistry, IEvm_Contract
+from kakarot.interfaces.interfaces import IRegistry
 from kakarot.execution_context import ExecutionContext
 from kakarot.constants import native_token_address, registry_address, evm_contract_class_hash
 from utils.utils import Helpers
@@ -38,23 +37,25 @@ func evm_contract_deployed(evm_contract_address: felt, starknet_contract_address
 // @author @abdelhamidbakhta
 // @custom:namespace Kakarot
 namespace Kakarot {
-    // @notice The constructor of the contract.
-    // @param _owner The address of the owner of the contract.
-    func constructor{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(owner: felt, native_token_address_, evm_contract_class_hash_: felt) {
+    // @notice The constructor of the contract
+    // @dev Setting initial owner, contract account class hash and native token
+    // @param _owner The address of the owner of the contract
+    // @param native_token_address_ The ERC20 contract used to emulate ETH
+    // @param evm_contract_class_hash_ The clash hash of the contract account
+    func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+        owner: felt, native_token_address_, evm_contract_class_hash_: felt
+    ) {
         Ownable.initializer(owner);
         evm_contract_class_hash.write(evm_contract_class_hash_);
         native_token_address.write(native_token_address_);
         return ();
     }
 
-    // @notice Execute an EVM bytecode.
-    // @param _bytecode The bytecode to execute.
-    // @param calldata The calldata to pass to the bytecode.
+    // @notice Execute EVM bytecode.
+    // @dev Executes a provided array of evm opcodes/bytes
+    // @param code_len The bytecode length
+    // @param code The bytecode to execute
+    // @param calldata The calldata which can be referenced by the bytecode
     // @return The pointer to the execution context.
     func execute{
         syscall_ptr: felt*,
@@ -87,10 +88,11 @@ namespace Kakarot {
         return ctx;
     }
 
-    // @notice Execute an EVM bytecode.
-    // @param _bytecode The bytecode to execute.
-    // @param calldata The calldata to pass to the bytecode.
-    // @return The pointer to the execution context.
+    // @notice execute bytecode of a given EVM contract
+    // @dev reads the bytecode content of an EVM contract and then executes it
+    // @param address The address of the contract whose bytecode will be executed
+    // @param calldata The calldata which contains the entry point and method parameters
+    // @return The pointer to the updated execution context.
     func execute_at_address{
         syscall_ptr: felt*,
         pedersen_ptr: HashBuiltin*,
@@ -149,9 +151,10 @@ namespace Kakarot {
         return run(instructions=instructions, ctx=ctx);
     }
 
-    // @notice Sets the account registry address.
-    // @param account registry address.
-    // @return None.
+    // @notice Set the account registry used by kakarot
+    // @dev Set the account regestry which will be used to convert
+    //      given starknet addresses to evm addresses and vice versa
+    // @param registry_address_ The address of the new account registry contract
     func set_account_registry{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         registry_address_: felt
     ) {
@@ -160,18 +163,17 @@ namespace Kakarot {
         return ();
     }
 
-    // @notice Sets the account registry address.
-    // @param account registry address.
-    // @return None.
+    // @notice Get the account registry used by kakarot
+    // @return address The address of the current account registry contract
     func get_account_registry{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         ) -> (address: felt) {
         let (reg_address) = registry_address.read();
         return (reg_address,);
     }
 
-    // @notice Sets the native token address.
-    // @param native token address.
-    // @return None.
+    // @notice Set the native token used by kakarot
+    // @dev Set the native token which will emulate the role of ETH on Ethereum
+    // @param native_token_address_ The address of the native token
     func set_native_token{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         native_token_address_: felt
     ) {
@@ -180,9 +182,15 @@ namespace Kakarot {
         return ();
     }
 
-    // @notice Deploy the starknetcontract holding the evm code
-    // @param bytes: byte code stored in the new contract
-    // @return evm_contract_address: address that is mapped to the actual new contract address
+    // @notice deploy contract account
+    // @dev Deploys a new starknet contract which functions as a new contract account and
+    //      will be mapped to an evm address
+    // @param bytes_len: the contract bytecode lenght
+    // @param bytes: the contract bytecode
+    // @return evm_contract_address The evm address that is mapped to the newly deployed starknet contract address
+    // @return starknet_contract_address The newly deployed starknet contract address
+    @external
+
     func deploy_contract{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         bytes_len: felt, bytes: felt*
     ) -> (evm_contract_address: felt, starknet_contract_address: felt) {
@@ -193,10 +201,12 @@ namespace Kakarot {
         let (local calldata: felt*) = alloc();
         let (kakarot_address) = get_contract_address();
 
+        // Prepare constructor data
         assert [calldata] = kakarot_address;
         assert [calldata + 1] = bytes_len;
         memcpy(dst=calldata + 2, src=bytes, len=bytes_len);
 
+        // Deploy contract account
         let (contract_address) = deploy(
             class_hash=class_hash,
             contract_address_salt=current_salt,
@@ -204,6 +214,7 @@ namespace Kakarot {
             constructor_calldata=calldata,
             deploy_from_zero=FALSE,
         );
+        // Increment salt
         salt.write(value=current_salt + 1);
         // Generate EVM_contract address from the new cairo contract
         // TODO: TEMPORARY SOLUTION FOR HACK-LISBON !!!

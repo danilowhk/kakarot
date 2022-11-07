@@ -20,12 +20,11 @@ namespace DuplicationOperations {
 
     // @notice Generic DUP operation
     // @dev Duplicate the top i-th stack item to the top of the stack.
-    func exec_dup_i{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(ctx: model.ExecutionContext*, i: felt) -> model.ExecutionContext* {
+    // @param ctx The pointer to the execution context.
+    // @return Updated execution context.
+    func exec_dup_i{range_check_ptr}(
+        ctx: model.ExecutionContext*, i: felt
+    ) -> model.ExecutionContext* {
         alloc_locals;
         %{
             import logging
@@ -55,6 +54,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup1{
         syscall_ptr: felt*,
@@ -62,7 +62,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=1);
+        let ctx = exec_dup_i(ctx=ctx, i=1);
+        return ctx;
     }
 
     // @notice DUP2 operation
@@ -71,6 +72,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup2{
         syscall_ptr: felt*,
@@ -78,7 +80,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=2);
+        let ctx = exec_dup_i(ctx=ctx, i=2);
+        return ctx;
     }
 
     // @notice DUP3 operation
@@ -87,6 +90,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup3{
         syscall_ptr: felt*,
@@ -94,7 +98,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=3);
+        let ctx = exec_dup_i(ctx=ctx, i=3);
+        return ctx;
     }
 
     // @notice DUP4 operation
@@ -103,6 +108,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup4{
         syscall_ptr: felt*,
@@ -110,7 +116,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=4);
+        let ctx = exec_dup_i(ctx=ctx, i=4);
+        return ctx;
     }
 
     // @notice DUP5 operation
@@ -119,6 +126,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup5{
         syscall_ptr: felt*,
@@ -126,7 +134,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=5);
+        let ctx = exec_dup_i(ctx=ctx, i=5);
+        return ctx;
     }
 
     // @notice DUP6 operation
@@ -135,6 +144,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup6{
         syscall_ptr: felt*,
@@ -142,7 +152,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=6);
+        let ctx = exec_dup_i(ctx=ctx, i=6);
+        return ctx;
     }
 
     // @notice DUP7 operation
@@ -151,6 +162,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup7{
         syscall_ptr: felt*,
@@ -158,7 +170,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=7);
+        let ctx = exec_dup_i(ctx=ctx, i=7);
+        return ctx;
     }
 
     // @notice DUP8 operation
@@ -167,6 +180,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup8{
         syscall_ptr: felt*,
@@ -174,7 +188,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=8);
+        let ctx = exec_dup_i(ctx=ctx, i=8);
+        return ctx;
     }
 
     // @notice DUP9 operation
@@ -183,6 +198,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup9{
         syscall_ptr: felt*,
@@ -190,7 +206,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=9);
+        let ctx = exec_dup_i(ctx=ctx, i=9);
+        return ctx;
     }
 
     // @notice DUP10 operation
@@ -199,6 +216,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup10{
         syscall_ptr: felt*,
@@ -206,7 +224,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=10);
+        let ctx = exec_dup_i(ctx=ctx, i=10);
+        return ctx;
     }
 
     // @notice DUP11 operation
@@ -215,6 +234,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup11{
         syscall_ptr: felt*,
@@ -222,7 +242,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=11);
+        let ctx = exec_dup_i(ctx=ctx, i=11);
+        return ctx;
     }
 
     // @notice DUP12 operation
@@ -231,6 +252,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup12{
         syscall_ptr: felt*,
@@ -238,7 +260,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=12);
+        let ctx = exec_dup_i(ctx=ctx, i=12);
+        return ctx;
     }
 
     // @notice DUP13 operation
@@ -247,6 +270,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup13{
         syscall_ptr: felt*,
@@ -254,7 +278,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=13);
+        let ctx = exec_dup_i(ctx=ctx, i=13);
+        return ctx;
     }
 
     // @notice DUP14 operation
@@ -263,6 +288,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup14{
         syscall_ptr: felt*,
@@ -270,7 +296,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=14);
+        let ctx = exec_dup_i(ctx=ctx, i=14);
+        return ctx;
     }
 
     // @notice DUP15 operation
@@ -279,6 +306,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup15{
         syscall_ptr: felt*,
@@ -286,7 +314,8 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=15);
+        let ctx = exec_dup_i(ctx=ctx, i=15);
+        return ctx;
     }
 
     // @notice DUP16 operation
@@ -295,6 +324,7 @@ namespace DuplicationOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context.
     // @return Updated execution context.
     func exec_dup16{
         syscall_ptr: felt*,
@@ -302,6 +332,7 @@ namespace DuplicationOperations {
         range_check_ptr,
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
-        return exec_dup_i(ctx=ctx, i=16);
+        let ctx = exec_dup_i(ctx=ctx, i=16);
+        return ctx;
     }
 }

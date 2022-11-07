@@ -33,8 +33,9 @@ from kakarot.instructions.sha3 import Sha3
 // @custom:namespace EVMInstructions
 namespace EVMInstructions {
     // @notice Decode the current opcode and execute associated function.
+    // @dev The function iterates through the provided instructions and executes each of them
+    //      whilst also performing safety checks and updating the pc counter after each instruction execution
     // @param instructions The instruction set.
-    // @param opcode The opcode value.
     // @param ctx The pointer to the execution context.
     // @return The pointer to the updated execution context.
     func decode_and_execute{
@@ -115,12 +116,7 @@ namespace EVMInstructions {
     // @param instructions the instruction set
     // @param opcode The opcode value
     // @param function the function to execute for the specified opcode
-    func add_instruction{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(instructions: felt*, opcode: felt, function: codeoffset) {
+    func add_instruction(instructions: felt*, opcode: felt, function: codeoffset) {
         assert [instructions + opcode] = cast(function, felt);
         return ();
     }
@@ -130,7 +126,8 @@ namespace EVMInstructions {
     // @custom:since Frontier
     // @custom:group Stop and Arithmetic Operations
     // @custom:gas 0
-    // @param ctx The pointer to the execution context.
+    // @param ctx The pointer to the execution context
+    // @return Updated execution context.
     func exec_stop{
         syscall_ptr: felt*,
         pedersen_ptr: HashBuiltin*,
@@ -141,7 +138,8 @@ namespace EVMInstructions {
             import logging
             logging.info("0x00 - STOP")
         %}
-        return ExecutionContext.stop(ctx_ptr);
+        let ctx = ExecutionContext.stop(ctx_ptr);
+        return ctx;
     }
 
     // @notice Prepare arguments for the dynamic call.
@@ -165,12 +163,7 @@ namespace EVMInstructions {
 
     // @notice Generate the instructions set for the EVM.
     // @return The instructions set.
-    func generate_instructions{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }() -> felt* {
+    func generate_instructions() -> felt* {
         alloc_locals;
         // Init instructions
         let (instructions: felt*) = alloc();
@@ -360,6 +353,10 @@ namespace EVMInstructions {
         // 0x46 - CHAINID
         add_instruction(
             instructions=instructions, opcode=0x46, function=BlockInformation.exec_chainid
+        );
+        // 0x47 - SELFBALANCE
+        add_instruction(
+            instructions=instructions, opcode=0x47, function=BlockInformation.exec_selfbalance
         );
         // 0x48 - BASEFEE
         add_instruction(

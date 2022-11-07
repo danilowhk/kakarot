@@ -195,7 +195,7 @@ namespace ArithmeticOperations {
         let b = popped[0];
 
         // Compute the division
-        let (result, _rem) = SafeUint256.div_rem(a, b);
+        let (result, _) = SafeUint256.div_rem(a, b);
 
         // Stack output:
         // a / b: integer result of the division modulo 2^256
@@ -234,7 +234,7 @@ namespace ArithmeticOperations {
         let b = popped[0];
 
         // Compute the division
-        let (result, _rem) = uint256_signed_div_rem(a, b);
+        let (result, _) = uint256_signed_div_rem(a, b);
 
         // Stack output:
         // a / b: signed integer result of the division modulo 2^256
@@ -273,7 +273,7 @@ namespace ArithmeticOperations {
         let b = popped[0];
 
         // Compute the modulo
-        let (_result, rem) = SafeUint256.div_rem(a, b);
+        let (_, rem) = SafeUint256.div_rem(a, b);
 
         // Stack output:
         // a % b:  integer result of the a % b
@@ -312,7 +312,7 @@ namespace ArithmeticOperations {
         let b = popped[0];
 
         // Compute the signed modulo
-        let (_result, rem) = uint256_signed_div_rem(a, b);
+        let (_, rem) = uint256_signed_div_rem(a, b);
 
         // Stack output:
         // a % b:  signed integer result of the a % b
@@ -355,7 +355,7 @@ namespace ArithmeticOperations {
         // Compute the addition
         let (result) = SafeUint256.add(a, b);
         // Compute the modulo
-        let (_result, rem) = SafeUint256.div_rem(result, c);
+        let (_, rem) = SafeUint256.div_rem(result, c);
 
         // Stack output:
         // integer result of a + b % c
@@ -398,7 +398,7 @@ namespace ArithmeticOperations {
         // Compute the addition
         let (result) = SafeUint256.mul(a, b);
         // Compute the modulo
-        let (_result, rem) = SafeUint256.div_rem(a=result, b=c);
+        let (_, rem) = SafeUint256.div_rem(a=result, b=c);
 
         // Stack output:
         // integer result of the a * b % c
@@ -473,10 +473,10 @@ namespace ArithmeticOperations {
         let stack = ctx.stack;
         let (stack, popped) = Stack.pop_n(self=stack, n=2);
         let b = popped[1];
-        let x = popped[0];
+        let a = popped[0];
 
         // Value is already a uint256
-        let stack: model.Stack* = Stack.push(self=stack, element=x);
+        let stack: model.Stack* = Stack.push(self=stack, element=a);
         let ctx = apply_context_changes(ctx=ctx, stack=stack, gas_cost=GAS_COST_SIGNEXTEND);
         return ctx;
     }
@@ -486,13 +486,7 @@ namespace ArithmeticOperations {
     // @param a The base.
     // @param b The exponent.
     // @return The result of the exponentiation.
-    func internal_exp{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(a: Uint256, b: Uint256) -> Uint256 {
-        alloc_locals;
+    func internal_exp{range_check_ptr}(a: Uint256, b: Uint256) -> Uint256 {
         let one_uint: Uint256 = Uint256(1, 0);
         let zero_uint: Uint256 = Uint256(0, 0);
 
@@ -515,15 +509,9 @@ namespace ArithmeticOperations {
     // @param stack The pointer to the stack.
     // @param gas_cost The gas cost to increment.
     // @return The pointer to the execution context.
-    func apply_context_changes{
-        syscall_ptr: felt*,
-        pedersen_ptr: HashBuiltin*,
-        range_check_ptr,
-        bitwise_ptr: BitwiseBuiltin*,
-    }(
+    func apply_context_changes(
         ctx: model.ExecutionContext*, stack: model.Stack*, gas_cost: felt
     ) -> model.ExecutionContext* {
-        alloc_locals;
         // Update context stack.
         let ctx = ExecutionContext.update_stack(self=ctx, new_stack=stack);
         // Increment gas used.

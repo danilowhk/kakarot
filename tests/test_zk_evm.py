@@ -814,6 +814,17 @@ test_cases = [
     },
     {
         "params": {
+            "code": "4700",
+            "calldata": "",
+            "stack": "420",
+            "memory": "",
+            "return_value": "",
+        },
+        "id": "Get balance of currently executing contract - 0x47 SELFBALANCE",
+        "marks": pytest.mark.execute_at_address,
+    },
+    {
+        "params": {
             "code": "3200",
             "calldata": "",
             "stack": "0",
@@ -968,7 +979,17 @@ test_cases = [
             "memory": "",
             "return_value": "",
         },
-        "id": "Get the size of calldata - 0x36 CALLDATASIZE",
+        "id": "Get the size of calldata when empty calldata - 0x36 CALLDATASIZE",
+    },
+    {
+        "params": {
+            "code": "3600",
+            "calldata": "ff",
+            "stack": "1",
+            "memory": "",
+            "return_value": "",
+        },
+        "id": "Get the size of calldata when non empty calldata - 0x36 CALLDATASIZE",
     },
     {
         "params": {
@@ -1410,7 +1431,18 @@ test_cases = [
 ]
 
 
-params = [pytest.param(case.pop("params"), **case) for case in test_cases]
+params_execute = [
+    pytest.param(case.pop("params"), **case)
+    for case in list(
+        filter(lambda x: x.get("marks") != pytest.mark.execute_at_address, test_cases)
+    )
+]
+params_execute_at_address = [
+    pytest.param(case.pop("params"), **case)
+    for case in list(
+        filter(lambda x: x.get("marks") == pytest.mark.execute_at_address, test_cases)
+    )
+]
 
 
 @pytest.mark.asyncio
@@ -1423,7 +1455,7 @@ class TestZkEVM:
 
     @pytest.mark.parametrize(
         "params",
-        params,
+        params_execute,
     )
     async def test_execute(self, zk_evm, params):
         Uint256 = zk_evm.struct_manager.get_contract_struct("Uint256")
@@ -1453,6 +1485,10 @@ class TestZkEVM:
         # TODO: This is a magic number.
     )
     async def test_execute_at_address(self,starknet: Starknet, zk_evm, params,contract_account_class: DeclaredClass):
+
+        params_execute_at_address,
+    )
+    async def test_execute_at_address(self, zk_evm, eth, params):
         Uint256 = zk_evm.struct_manager.get_contract_struct("Uint256")
         # tx = await zk_evm.deploy(
         #     bytes=[int(b, 16) for b in wrap(params["code"], 2)],
@@ -1493,6 +1529,7 @@ class TestZkEVM:
 
         res3 = await zk_evm.execute_at_address(
             address=res2.result.evm_contract_address,
+
             calldata=[int(b, 16) for b in wrap(params["calldata"], 2)],
         ).execute(caller_address=1)
 

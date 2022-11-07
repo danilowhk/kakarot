@@ -3,10 +3,7 @@
 %lang starknet
 
 // Starkware dependencies
-from starkware.cairo.common.bool import FALSE, TRUE
 from starkware.cairo.common.cairo_builtins import HashBuiltin, BitwiseBuiltin
-from starkware.cairo.common.math import assert_le
-from starkware.cairo.common.math_cmp import is_le, is_le_felt
 from starkware.cairo.common.uint256 import Uint256, uint256_unsigned_div_rem
 from starkware.cairo.common.alloc import alloc
 
@@ -15,7 +12,6 @@ from utils.utils import Helpers
 from kakarot.stack import Stack
 from kakarot.memory import Memory
 from kakarot.execution_context import ExecutionContext
-from kakarot.constants import Constants
 from kakarot.interfaces.interfaces import IEvm_Contract
 
 // @title Exchange operations opcodes.
@@ -43,6 +39,7 @@ namespace MemoryOperations {
     // @custom:gas 3 + dynamic gas
     // @custom:stack_consumed_elements 1
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_mload{
         syscall_ptr: felt*,
@@ -87,6 +84,7 @@ namespace MemoryOperations {
     // @custom:gas 3 + dynamic gas
     // @custom:stack_consumed_elements 2
     // @custom:stack_produced_elements 0
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_mstore{
         syscall_ptr: felt*,
@@ -105,8 +103,9 @@ namespace MemoryOperations {
         // Stack input:
         // 0 - offset: memory offset of the work we save.
         // 1 - value: value to store in memory.
-        let (stack, offset) = Stack.pop(stack);
-        let (stack, value) = Stack.pop(stack);
+        let (stack, popped) = Stack.pop_n(self=stack, n=2);
+        let offset = popped[1];
+        let value = popped[0];
 
         %{
             import logging
@@ -165,6 +164,7 @@ namespace MemoryOperations {
     // @custom:since Frontier
     // @custom:group Stack Memory Storage and Flow operations.
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_msize{
         syscall_ptr: felt*,
@@ -195,6 +195,7 @@ namespace MemoryOperations {
     // @custom:group Stack Memory and Flow operations.
     // @custom:gas 8
     // @custom:stack_consumed_elements 1
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_jump{
         syscall_ptr: felt*,
@@ -223,10 +224,6 @@ namespace MemoryOperations {
         // Update pc counter.
         let ctx = ExecutionContext.update_program_counter(ctx, offset.low);
 
-        %{
-            import logging
-            #logging.info(f"UPDATED COUNTER:{ids.ctx.program_counter}")
-        %}
 
         // Update context stack.
         let ctx = ExecutionContext.update_stack(ctx, stack);
@@ -242,6 +239,7 @@ namespace MemoryOperations {
     // @custom:group Stack Memory and Flow operations.
     // @custom:gas 10
     // @custom:stack_consumed_elements 2
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_jumpi{
         syscall_ptr: felt*,
@@ -259,9 +257,10 @@ namespace MemoryOperations {
 
         // Stack input:
         // 0 - offset: offset in the deployed code where execution will continue from
-        // 1 - skip_jump: condition that will trigger a jump if not FALSE
-        let (stack, offset) = Stack.pop(stack);
-        let (stack, skip_condition) = Stack.pop(stack);
+        // 1 - skip_condition: condition that will trigger a jump if not FALSE
+        let (stack, popped) = Stack.pop_n(self=stack, n=2);
+        let offset = popped[1];
+        let skip_condition = popped[0];
 
         %{
             import logging
@@ -290,10 +289,11 @@ namespace MemoryOperations {
     }
 
     // @notice JUMPDEST operation
-    // @dev Set this pc as Jumpdestination and improve Program Counter by one.
+    // @dev Serves as a check that JUMP or JUMPI was executed correctly. We only update gas used.
     // @custom:since Frontier
     // @custom:group Stack Memory Storage and Flow operations.
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_jumpdest{
         syscall_ptr: felt*,
@@ -319,6 +319,7 @@ namespace MemoryOperations {
     // @custom:group Stack Memory Storage and Flow operations.
     // @custom:stack_consumed_elements 1
     // @custom:stack_produced_elements 0
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_pop{
         syscall_ptr: felt*,
@@ -346,12 +347,13 @@ namespace MemoryOperations {
     }
 
     // @notice MSTORE8 operation
-    // @dev Save word to memory.
+    // @dev Save single byte to memory
     // @custom:since Frontier
     // @custom:group Stack Memory Storage and Flow operations.
     // @custom:gas 3
     // @custom:stack_consumed_elements 2
     // @custom:stack_produced_elements 0
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_mstore8{
         syscall_ptr: felt*,
@@ -370,13 +372,16 @@ namespace MemoryOperations {
         // Stack input:
         // 0 - offset: memory offset of the work we save.
         // 1 - value: value from which the last byte will be extracted and stored in memory.
-        let (stack, offset) = Stack.pop(stack);
-        let (stack, value) = Stack.pop(stack);
-        let (quotient, remainder) = uint256_unsigned_div_rem(value, Uint256(256, 0));
+        let (stack, popped) = Stack.pop_n(self=stack, n=2);
+        let offset = popped[1];
+        let value = popped[0];
 
+        // Extract last byte from stack value
+        let (_, remainder) = uint256_unsigned_div_rem(value, Uint256(256, 0));
         let (value_pointer: felt*) = alloc();
         assert [value_pointer] = remainder.low;
 
+        // Store byte to memory at offset
         let memory: model.Memory* = Memory.store_n(
             self=ctx.memory, element_len=1, element=value_pointer, offset=offset.low
         );
@@ -398,6 +403,7 @@ namespace MemoryOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 2
     // @custom:stack_produced_elements 0
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_sstore{
         syscall_ptr: felt*,
@@ -421,8 +427,9 @@ namespace MemoryOperations {
         // Stack input:
         // 0 - key: key of memory.
         // 1 - value: value for given key.
-        let (stack, local key) = Stack.pop(stack);
-        let (stack, local value) = Stack.pop(stack);
+        let (stack, popped) = Stack.pop_n(self=stack, n=2);
+        let key = popped[1];
+        let value = popped[0];
 
         %{
             import logging
@@ -432,7 +439,6 @@ namespace MemoryOperations {
         %}
 
         // 3. Call Write storage on contract with starknet address
-
         with_attr error_message("Contract call failed") {
             IEvm_Contract.write_state(contract_address=starknet_address, key=key, value=value);
         }
@@ -451,6 +457,7 @@ namespace MemoryOperations {
     // @custom:gas 3
     // @custom:stack_consumed_elements 2
     // @custom:stack_produced_elements 0
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_sload{
         syscall_ptr: felt*,
@@ -499,6 +506,7 @@ namespace MemoryOperations {
     // @custom:group Stack Memory Storage and Flow operations.
     // @custom:stack_consumed_elements 0
     // @custom:stack_produced_elements 1
+    // @param ctx The pointer to the execution context
     // @return Updated execution context.
     func exec_gas{
         syscall_ptr: felt*,
