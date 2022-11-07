@@ -87,17 +87,18 @@ func execute_at_address{
 
     let len = Stack.len(context.stack);
 
-    %{
-        import logging
-        i = 0
-        res = ""
-        for i in range(ids.context.return_data_len):
-            res += " " + str(memory.get(ids.context.return_data + i))
-            i += i
-        logging.info("*************RETURN_DATA AFTER EXECUTE_AT_ADDRESS*****************")
-        logging.info(res)
-        logging.info("************************************")
-    %}
+    // %{
+    //     import logging
+    //     i = 0
+    //     res = ""
+    //     for i in range(ids.context.return_data_len):
+    //         res += " " + str(memory.get(ids.context.return_data + i))
+    //         i += i
+    //     logging.info("*************RETURN_DATA AFTER EXECUTE_AT_ADDRESS*****************")
+    //     logging.info(res)
+    //     logging.info("************************************")
+    // %}
+    
     return (
         stack_len=len,
         stack=context.stack.elements,

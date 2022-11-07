@@ -8,7 +8,7 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin, BitwiseBuiltin
 from starkware.starknet.common.syscalls import get_caller_address, get_tx_info
 from starkware.cairo.common.uint256 import Uint256
-from starkware.cairo.common.math import assert_lt
+from starkware.cairo.common.math import assert_lt ,unsigned_div_rem
 from starkware.cairo.common.math_cmp import is_le_felt
 from starkware.cairo.common.memcpy import memcpy
 
@@ -166,8 +166,12 @@ namespace EnvironmentalInformation {
             logging.info("0x33 - CALLER")
         %}
         // Get caller address.
-        let (current_address) = get_caller_address();
+        //TODO implement proper get caller address
+        let current_address: felt = 1;
+        // let max_value: felt = 1048576;
+        // let (_,rem) = unsigned_div_rem(current_address,1048576);
         let caller_address = Helpers.to_uint256(current_address);
+
         let stack: model.Stack* = Stack.push(self=ctx.stack, element=caller_address);
 
         // Update the execution context.

@@ -41,8 +41,6 @@ async def set_account_registry(zk_evm, account_registry):
     )
 
 
-
-
 test_cases = [
     {
         "params": {
