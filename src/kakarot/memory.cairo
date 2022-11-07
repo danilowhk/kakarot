@@ -54,49 +54,47 @@ namespace Memory {
 
         local max_copy: felt;
         if (is_offset_greater_than_length == 1) {
-            Helpers.fill(arr=new_memory + bytes_len, value=0, length=offset - bytes_len);
-            max_copy = bytes_len;
+            Helpers.fill(arr=new_memory + self.bytes_len, value=0, length=offset - self.bytes_len);
+            max_copy = self.bytes_len;
         } else {
             max_copy = offset;
         }
         if (self.bytes_len != 0) {
             memcpy(dst=new_memory, src=self.bytes, len=max_copy);
         }
-        // %{
-        //     import logging
-        //     logging.info("BEFORE SPLIT_IN_1")
-        // %}
+
 
         split_int(
             value=element.high,
             n=16,
             base=2 ** 8,
             bound=2 ** 128,
-            output=self.bytes + bytes_len + 16,
+            output=self.bytes + self.bytes_len + 16,
         );
 
         split_int(
-            value=element.low, n=16, base=2 ** 8, bound=2 ** 128, output=self.bytes + bytes_len
+            value=element.low, n=16, base=2 ** 8, bound=2 ** 128, output=self.bytes + self.bytes_len
         );
 
         Helpers.reverse(
             old_arr_len=32,
-            old_arr=self.bytes + bytes_len,
+            old_arr=self.bytes + self.bytes_len,
             new_arr_len=32,
             new_arr=new_memory + offset,
         );
- 
+        
         let is_memory_growing = is_le_felt(self.bytes_len, offset + 32);
         local new_bytes_len: felt;
         if (is_memory_growing == 1) {
-            new_bytes_len = offset + 32;
+            let (_, rem) = unsigned_div_rem(offset, 32);
+            new_bytes_len = offset + rem + 32;
         } else {
             memcpy(
                 dst=new_memory + offset + 32,
                 src=self.bytes + offset + 32,
-                len=bytes_len - (offset),
+                len=self.bytes_len - (offset),
             );
-            new_bytes_len = bytes_len;
+            new_bytes_len = self.bytes_len;
         }
 
 

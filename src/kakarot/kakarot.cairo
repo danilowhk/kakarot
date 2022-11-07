@@ -68,25 +68,26 @@ func execute_at_address{
     syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr, bitwise_ptr: BitwiseBuiltin*
 }(address: felt, calldata_len: felt, calldata: felt*) -> (
 
-    stack_len: felt, stack: Uint256*, memory_len: felt, memory: felt*, evm_contract_address: felt, starknet_contract_address: felt,return_data_len:felt, return_data: felt*) {
+    stack_len: felt, stack: Uint256*, memory_len: felt, memory: felt*, evm_contract_address: felt, starknet_contract_address: felt,return_data_len:felt, return_data: felt*,gas_used:felt) {
     alloc_locals;
     
     // Check is _to address is 0x0000..00:
     if(address == 0){
-        let (stack: Uint256*) = alloc();
+        let (empty_stack: Uint256*) = alloc();
         let (zero_array: felt*) = alloc();
         // Deploy contract
 
         let (evm_contract_address:felt, starknet_contract_address:felt) = deploy(bytes_len=calldata_len,bytes=calldata);
         return (
             stack_len=0,
-            stack = stack,
+            stack = empty_stack,
             memory_len=0,
             memory=zero_array,
             evm_contract_address=evm_contract_address,
             starknet_contract_address =starknet_contract_address,
             return_data_len=0,
-            return_data=zero_array
+            return_data=zero_array,
+            // TODO: implement gas_used in deploy.
             gas_used=0,
         );
     }
@@ -111,9 +112,8 @@ func execute_at_address{
         evm_contract_address= context.evm_address,
         starknet_contract_address=context.starknet_address,
         return_data_len=context.return_data_len,
-        return_data=context.return_data
+        return_data=context.return_data,
         gas_used=context.gas_used,
-
     );
 }
 
@@ -177,28 +177,18 @@ func deploy{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 @external
 func initiate{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr,bitwise_ptr: BitwiseBuiltin*}(evm_address: felt, starknet_address:felt)->(evm_contract_address: felt, starknet_contract_address: felt){
     alloc_locals;
-    // let (array : felt*) = alloc();
-    //Check if it it inisiated
-    // let (is_initiated) = IEvm_Contract.is_initiated(contract_address=starknet_address);
-    // with_attr error_message("Contract already initiated"){
-    //     assert is_initiated = 0;
-    // }
 
-    // let (registry_address_) = registry_address.read();
-    // let (starknet_address) = IRegistry.get_starknet_address(
-    //         contract_address=registry_address_, evm_address=address
-    // );
-
-
+    // Check if it it inisiated
+    let (is_initiated) = IEvm_Contract.is_initiated(contract_address=starknet_address);
+    with_attr error_message("Contract already initiated"){
+        assert is_initiated = 0;
+    }
 
     // Get constructor and runtime code
     let (bytecode_len, bytecode) = IEvm_Contract.code(contract_address=starknet_address);
 
-
     //Run bytecode
     let context : model.ExecutionContext* = Kakarot.execute_at_address(address=evm_address,calldata=bytecode);
-
-
 
     // Update evm_contract code
     IEvm_Contract.store_code(contract_address=context.starknet_address, code_len=context.return_data_len, code=context.return_data);

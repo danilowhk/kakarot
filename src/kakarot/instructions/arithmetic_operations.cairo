@@ -127,10 +127,10 @@ namespace ArithmeticOperations {
         bitwise_ptr: BitwiseBuiltin*,
     }(ctx: model.ExecutionContext*) -> model.ExecutionContext* {
         alloc_locals;
-        // %{
-        //     import logging
-        //     logging.info("0x03 - SUB")
-        // %}
+        %{
+            import logging
+            logging.info("0x03 - SUB")
+        %}
 
         // Stack input:
         // 0 - a: first integer value to sub.
@@ -140,24 +140,8 @@ namespace ArithmeticOperations {
         let a = popped[1];
         let b = popped[0];
 
-        // %{
-        //     import logging
-        //     logging.info("0x03 - SUB")
-        //     logging.info(ids.a.low)
-        //     logging.info(ids.b.low)
-        // %}
-
-        // Compute the subtraction
-        // let (result) = SafeUint256.sub_le(a, b);
         let (result) = uint256_sub(a,b);
-        // %{
-        //     import logging
-        //     logging.info("0x03 - SUB")
-        //     logging.info(ids.a.low)
-        //     logging.info(ids.b.low)
-        //     logging.info(ids.result.low)
-        //     logging.info(ids.result.high)
-        // %}
+
         // Stack output:
         // a - b: integer result of the subtraction modulo 2^256
         let stack: model.Stack* = Stack.push(self=stack, element=result);
